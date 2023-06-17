@@ -246,12 +246,11 @@ index= index(:, 1:end)';
 maximum_neuron= maximum_neuron(:, 1:end)';
 %the n inconsistent
 %maximum_neuron= maximum_neuron(maximum_neuron>.05)
-best_r= horzcat(index, maximum_neuron);
+%best_r= horzcat(index, maximum_neuron);
 
 mean_index= mean(index);
 
 
-%r2_mean_all = r2_mean_all(r2_mean_all(R_all, 1)>0.05);
 %standard deviation
 r2_std_all= std(maximum_neuron);
 %standard error
@@ -444,8 +443,7 @@ for i= 1:30
 %preprocess R_squared for the location matrixes over different time points
 maximum_neuron_overtime= maximum_neuron_overtime(:, 1:end)';
 %the n inconsistent
-%maximum_neuron_overtime= maximum_neuron_overtime(maximum_neuron_overtime>.05)
-%best_r= horzcat(index, maximum_neuron);
+
 
 
 
@@ -460,18 +458,9 @@ max_neuron_time = zeros(96, 1);
 
 %use accumarray to group the first and second collumn and find its max
 %between them
-%scaling_factor = 1000;
-%matrix_info_overtime(:,1)= matrix_info_overtime(:, 1)* 1000;
-%matrix_info_overtime(matrix_info_overtime(:, 1) < 0.2, 1) = 1;
-%scaled = round(matrix_info_overtime(:, 1) * scaling_factor);
 grouped_vals = accumarray(matrix_info_overtime(:,2), matrix_info_overtime(:, 1), [], @max);
-%grouped_vals = accumarray(matrix_info_overtime(:, 1), matrix_info_overtime(:, 2));
-%grouped_vals= find(max(matrix_info_overtime(:, 1),matrix_info_overtime(:, 2)))
-%set the maximum value of the grouped_vals to each row coressponding to the channel
-%grouped_vals= grouped_vals/scaling_factor
+
 max_neuron_time(1:size(grouped_vals, 1)) = grouped_vals; 
-
-
 
 
 
@@ -626,23 +615,6 @@ xlabel('shifts');
 ylabel('count');
 title('number of neurons in each bin')
 
-
-%%plotting
-
-
-%%only print first 5 just to check
-%for l= 1:5
-%figure(l);
-%plot(test_f_rates(:,l), 'b-');
-%hold on;
-%plot(test_pred(:,l), 'r-');
-%hold off;
-%xlabel('time in seconds') 
-%ylabel('firing rate') 
-%title('actual firing rate and predicted firing rate') 
-%legend('measured firing rate', 'predicted firing_rate')
-
-%end
 
 
 %% Function that implements the ridge regression
