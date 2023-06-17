@@ -267,6 +267,7 @@ t_score = tinv([0.025  0.975],length(maximum_neuron)-1);
 %S1_unit_guide= trial_data.S1_unit_guide;  
 %save('S1_unit_guide.mat', 'S1_unit_guide');
 %make it a double 
+load('S1_unit_guide.mat')
 S1_unit_guide= double(S1_unit_guide);
 %make the index starting from 1 instead of 0 for each neuron
 S1_unit_guide(:,2) = S1_unit_guide(:,2) + 1;
