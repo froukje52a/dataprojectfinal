@@ -469,44 +469,37 @@ index_visual_matrix(isnan(index_matrix)) = 0;
 subplot(1, 3, 1);
 index_visual_matrix(index_matrix <= 14) = 1;
 index_visual_matrix(index_matrix > 14 ) = 2;
-colors = colormap;
-%set nan value a different color
-colors(1, :) =  [0.5 0.5 0.5]; 
 colormap(colors);
 imagesc(index_visual_matrix);
 colorbar;
 title('<=- 49 sensory feedback')
 xlabel('columns')
 ylabel('rows')
+
 subplot(1, 3, 2);
 index_visual_matrix(index_matrix <= 16) = 1;
-index_visual_matrix(index_matrix > 16 ) = 2;
-colors = colormap;
-%set nan value a different color
-colors(1, :) =  [0.5 0.5 0.5]; 
+index_visual_matrix(index_matrix > 16 ) = 2; 
 colormap(colors);
 imagesc(index_visual_matrix);
 colorbar;
 title('<= -29.4 sensory feedback')
 xlabel('columns')
 ylabel('rows')
+
 subplot(1, 3, 3);
 index_visual_matrix(index_matrix <= 18) = 1;
 index_visual_matrix(index_matrix > 18 ) = 2;
-imagesc(index_visual_matrix);
-colors = colormap;
-%set nan value a different color
-colors(1, :) =  [0.5 0.5 0.5]; 
+imagesc(index_visual_matrix); 
 colormap(colors);
 colorbar;
 title('<= -9.8 sensory feedback')
 xlabel('columns')
 ylabel('rows')
-%legend(index_visual_matrix, {'Nan','sensory feedback','efference copy'})
 
-%%
+
+%% plot the maximum shift index and its corresponding maximum R squared
 figure(9)
-%concatenatet the max_index_and_neuron with S1_unit_guide
+%concatenate the max_index_and_neuron with S1_unit_guide
 histogram_info= horzcat(max_index_and_neuron, S1_unit_guide);
 %remove the fourth column
 histogram_info= histogram_info(:, 1:2);
@@ -520,10 +513,11 @@ for i = 1:length(time_shift)
 end
 
 bar(time_shift, maximum_r_at_time_shift);
-xlabel("time shift")
+xlabel("shift index")
 ylabel('R2 values')
-title("max R2 at the time shift")
-%%
+title("max R2 at the shift index")
+
+%% plot the number of maximum at that shift index of the max r squared 
 figure(10)
 shifts_number_val = histogram_info(:, 1);  
 
@@ -531,13 +525,11 @@ hist_bar = histogram(shifts_number_val);
 count = hist_bar.BinCounts;
 edge = hist_bar.BinEdges;
 shift = (edge(1:end-1) + edge(2:end)) / 2;
-xlabel('shifts');
+xlabel('shift index');
 ylabel('count');
 title('number of neurons in each bin')
 
-
-
-%% Function that implements the ridge regression
+%% Functions
 
 function [lambda_mse, B_weights]= ridge_regression(X_train, Y_train,X_validation, Y_validation, lambda)
 %[lambda_mse, B_weights]= ridge_regression(X_train, Y_train,X_validation, Y_validation, lambda)
