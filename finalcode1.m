@@ -368,65 +368,54 @@ xlabel('columns')
 ylabel('rows')
 
 %%
-R_all_columns= mean(R_all,1);
-for i= 1:30
-    %[maximum_neuron_overtime, index ] = max(r2_mean_all(i,:));
-    [maximum_neuron_overtime, index ] = max(R_all_columns(:,i,:), [], 2);
-
-
-%preprocess R_squared for the location matrixes over different time points
-maximum_neuron_overtime= maximum_neuron_overtime(:, 1:end)';
-
-
-%concatenatet the max_index_and_neuron with S1_unit_guide
-matrix_info_overtime= horzcat(maximum_neuron_overtime, S1_unit_guide);
-%remove the third column
-matrix_info_overtime= matrix_info_overtime(:, 1:2);
 %initiliase an array with maximum value for the each neuron or the maximum
 %shift
-max_neuron_time = zeros(96, 1);
-
-
-%use accumarray to group the first and second collumn and find its max
-%between them
-grouped_vals = accumarray(matrix_info_overtime(:,2), matrix_info_overtime(:, 1), [], @max);
-
-max_neuron_time(1:size(grouped_vals, 1)) = grouped_vals; 
-
-
-
-
-
-%%assign the channels to the values
-all_rows = size(max_neuron_time, 1);
-all_indices = (1:all_rows);
-%concatenate the channel with the max_neuron
-max_neuron_time= horzcat(all_indices', max_neuron_time);
-
-
-
-%% display the maximum R_squared in the matrix 
+max_neuron_i = zeros(96, 1);
 %initialise R_squared_matrix
-R_squared_overtime= zeros(size(matrix_location));
+R_squared_matrix1 = zeros(size(matrix_location));
 
-%loop over the rows of the matrix_location
-for rows = 1:size(matrix_location, 1)
-    %loop over the columns of the matrix_location
-    for cols = 1:size(matrix_location, 2)
-        %compare the channel of max_neuron with the matrix location and obtain 
-        %the value of that channel out of the second column of max_neuron.
-        maximumvalue_neuron_time = max_neuron_time(max_neuron_time(:, 1) == matrix_location(rows, cols), 2);
+
+R_all_columns= mean(R_all,1);
+for i= 1:30
+    [maximum_neuron_index, index ] = max(R_all_columns(:,i,:), [], 2);
+
+    %preprocess R_squared for the location matrixes over different time points
+    maximum_neuron_i= maximum_neuron_index(:, 1:end)';
+
+    %concatenate with S1_unit_guide
+    matrix_info_i= horzcat(maximum_neuron_i, S1_unit_guide);
+    %remove the third column
+    matrix_info_i= matrix_info_i(:, 1:2);
+
+    %find its max between them
+    group = accumarray(matrix_info_i(:,2), matrix_info_i(:, 1), [], @max);
+    max_neuron_i(1:size(group, 1)) = group; 
+
+    %assign the channels to the values
+    all_rows = size(max_neuron_i, 1);
+    all_indices = (1:all_rows);
+    %concatenate the channel with the max_neuron
+    max_neuron_i= horzcat(all_indices', max_neuron_i);
+
+    %% display the maximum R_squared in the matrix 
+ 
+    %loop over the rows of the matrix_location
+    for rows = 1:size(matrix_location, 1)
+        %loop over the columns of the matrix_location
+        for cols = 1:size(matrix_location, 2)
+            %compare the channel of max_neuron with the matrix location and obtain 
+            %the value of that channel out of the second column of max_neuron.
+            maximumvalue_i = max_neuron_i(max_neuron_i(:, 1) == matrix_location(rows, cols), 2);
        %account for empty values 
-        if isempty(maximumvalue_neuron_time)
+        if isempty(maximumvalue_i)
             R_squared_matrix1(rows, cols) = 0; 
         else
             %assign the maximum value of the neuron to the the R_squared
-            %matrix and tot the index_matrix
-            R_squared_matrix1(rows, cols) = maximumvalue_neuron_time;
+            R_squared_matrix1(rows, cols) = maximumvalue_i;
 
         end
+        end
     end
-end
 figure(7)
 shiftclear_R_squared = R_squared_matrix1;
 shiftclear_R_squared(shiftclear_R_squared >.3) = 0.3;
