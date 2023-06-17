@@ -443,26 +443,13 @@ colormap(colors);
 imagesc(shiftclear_R_squared )
 title(i)
 end 
-%colorbar;
 
 
-%%
+
+%% mean overall performance at edifferent time points
 %taking the mean of each column
 index_matrix(index_matrix == 0) = NaN;
-column_index= nanmean(index_matrix);
-%taking the mean of each row
-row_index= nanmean(index_matrix,2);
 
-%taking the mean of each column of the R_squared to look at where it best
-%performs
-R_squared_matrix(R_squared_matrix == 0) = NaN;
-column_R= nanmean(R_squared_matrix);
-%taking the mean of each row
-row_R= nanmean(R_squared_matrix,2);
-
-%%
-
-%visually indexing 
 figure(8);
 index_visual_matrix = zeros(10,10);
 index_visual_matrix(isnan(index_matrix)) = 0;
