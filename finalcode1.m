@@ -204,7 +204,6 @@ r2_mean_all = squeeze(mean(R_all, 1));
 %mean value per shift
 r2_mean_all_rowindex= mean(r2_mean_all,2);
 
-%figure
 figure(3)
 %shows the mean R_squared of all the rows which are significant
 plot(r2_mean_all_rowindex);
@@ -464,7 +463,7 @@ row_R= nanmean(R_squared_matrix,2);
 %%
 
 %visually indexing 
-figure(9);
+figure(8);
 index_visual_matrix = zeros(10,10);
 index_visual_matrix(isnan(index_matrix)) = 0;
 subplot(1, 3, 1);
@@ -506,7 +505,7 @@ ylabel('rows')
 %legend(index_visual_matrix, {'Nan','sensory feedback','efference copy'})
 
 %%
-figure(10)
+figure(9)
 %concatenatet the max_index_and_neuron with S1_unit_guide
 histogram_info= horzcat(max_index_and_neuron, S1_unit_guide);
 %remove the fourth column
@@ -525,13 +524,13 @@ xlabel("time shift")
 ylabel('R2 values')
 title("max R2 at the time shift")
 %%
-figure(11)
+figure(10)
 shifts_number_val = histogram_info(:, 1);  
 
 hist_bar = histogram(shifts_number_val);
 count = hist_bar.BinCounts;
-edges = hist_bar.BinEdges;
-shift = (edges(1:end-1) + edges(2:end)) / 2;
+edge = hist_bar.BinEdges;
+shift = (edge(1:end-1) + edge(2:end)) / 2;
 xlabel('shifts');
 ylabel('count');
 title('number of neurons in each bin')
@@ -584,7 +583,6 @@ loc_channel = zeros(size(f_rates,2),3);
 
 %initialise the base matrix_location matrix
 matrix_location= zeros(10,10);
-
 
 %loop over every channel
 for ch = 1:size(electrodes_h, 1)
