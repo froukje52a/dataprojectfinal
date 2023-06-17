@@ -268,26 +268,29 @@ electrodes_h= electrodes(97:192, :);%monkey H is from 97-192
 %shows the loaction of the channels in the brain
 disp(matrix_location)
 
-
-%% line them up correctly the best_r with the 
+%% line them up correctly the maximum R squared of the mean values with the maximum index
 %find the maximum of each neuron and its corresponding index
 [maximum_neuron, index ] = max(r2_mean_all);
 
 %preprocess the maximum neuron and R_squared for the location matrixes
 index= index(:, 1:end)';
 maximum_neuron= maximum_neuron(:, 1:end)';
-%concatenate maximum_neuron and index into best_r
-best_r= horzcat(index, maximum_neuron);
+%concatenate maximum_neuron and index into max_index_and_neuron
+max_index_and_neuron= horzcat(index, maximum_neuron);
 
-%concatenatet the best_r with S1_unit_guide
-matrix_info= horzcat(best_r, S1_unit_guide);
-%remove the fourth column
+%concatenate the max_index_and_neuron with S1_unit_guide
+matrix_info= horzcat(max_index_and_neuron, S1_unit_guide);
+%remove the fourth column because not of interest here
 matrix_info= matrix_info(:, 1:3);
+
+
 %initiliase an array with maximum value for the each neuron or the maximum
 %shift
 max_neuron = zeros(96, 1);
 max_shift = zeros(96, 1);
 
+%keeps only the maximum value of mean values of the R2 and its corresponding index 
+%if there are multiple neurons in one channel 
 
 %use accumarray to group the second and third collumn and find its max
 %between them
@@ -299,7 +302,6 @@ max_neuron(1:size(grouped_vals, 1)) = grouped_vals;
 grouped_vals_shift = accumarray(matrix_info(:, 3), matrix_info(:, 1), [], @max);
 %set the maximum value of the grouped_vals_shift to each row coressponding to the channel
 max_shift(1:size(grouped_vals_shift, 1)) = grouped_vals_shift; 
-
 
 %%assign the channels to the values
 all_rows = size(max_neuron, 1);
@@ -313,7 +315,7 @@ all_indices_shift = (1:all_rows_shift);
 max_shift= horzcat(all_indices_shift', max_shift);
 
 
-%% display the maximum R_squared in the matrix and the maximum index according shift in the matrix
+%% display the maximum R_squared in the matrix and the maximum index at the correct location matrix
 %initialise R_squared_matrix
 R_squared_matrix = zeros(size(matrix_location));
 %initialise index matrix
@@ -357,9 +359,8 @@ colormap(colors);
 colorbar;
 xlabel('columns')
 ylabel('rows')
-%imagesc(clear_R_squared,'AlphaData',~isnan(clear_R_squared))
 
-%end 
+
 figure(6)
 colors = colormap;
 %set nan value a different color
@@ -379,12 +380,9 @@ for i= 1:30
 
 %preprocess R_squared for the location matrixes over different time points
 maximum_neuron_overtime= maximum_neuron_overtime(:, 1:end)';
-%the n inconsistent
 
 
-
-
-%concatenatet the best_r with S1_unit_guide
+%concatenatet the max_index_and_neuron with S1_unit_guide
 matrix_info_overtime= horzcat(maximum_neuron_overtime, S1_unit_guide);
 %remove the third column
 matrix_info_overtime= matrix_info_overtime(:, 1:2);
@@ -445,20 +443,6 @@ colors(1, :) =  [0.5 0.5 0.5];
 colormap(colors);
 imagesc(shiftclear_R_squared )
 title(i)
-
-if i ==19
-    figure(8)
-    shiftclear_R_squared = R_squared_matrix1;
-    shiftclear_R_squared(shiftclear_R_squared >.3) = 0.3;
-    imagesc(shiftclear_R_squared)
-    shiftclear_R_squared (isnan(shiftclear_R_squared ))=0;
-    colors = colormap;
-    %set nan value a different color
-    colors(1, :) =  [0.5 0.5 0.5]; 
-    colormap(colors);
-    imagesc(shiftclear_R_squared)
-    colorbar;
-end
 end 
 %colorbar;
 
@@ -523,8 +507,8 @@ ylabel('rows')
 
 %%
 figure(10)
-%concatenatet the best_r with S1_unit_guide
-histogram_info= horzcat(best_r, S1_unit_guide);
+%concatenatet the max_index_and_neuron with S1_unit_guide
+histogram_info= horzcat(max_index_and_neuron, S1_unit_guide);
 %remove the fourth column
 histogram_info= histogram_info(:, 1:2);
 
