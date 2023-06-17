@@ -162,9 +162,7 @@ for c= 1:number
         
         %get the correct value assigned to the R_all
         R_all((c-1)*10+1:c*10, :,:) = R_squared;
-        
-        end   
-        
+        end      
     end
 end
 %% analyse the R_squared
@@ -179,11 +177,13 @@ R2_mean_0offset= squeeze(mean(R2_0offset));
 R2_mean_0offset_cutoff= R2_mean_0offset(R2_mean_0offset>0.05);
 value_R2_mean_0offset= mean(R2_mean_0offset);
 value_R2_mean_0offset_cutoff= mean(R2_mean_0offset_cutoff);
+
 figure(1)
 plot(R2_mean_0offset)
 xlabel('neurons')
 ylabel('R squared values')
 title('maximum R squared for eache neuron aligned')
+
 figure(2)
 plot(R2_mean_0offset)
 hold on;
@@ -251,8 +251,7 @@ save('electrode.mat', 'electrode');
 
 %only get the "interesting" arrays of the table
 electrodes = table2array(electrode(:, {'chan', 'rowNum', 'colNum'}));
-%matrix with column 1 all the channels, column 2 the rowNumbers and
-%columnnumber
+%matrix with column 1 all the channels, column 2 the rowNumbers and columnnumber
 
 %% make table into matrix with the channels in the correct place for the matrix
 
@@ -281,7 +280,7 @@ matrix_info= horzcat(max_index_and_neuron, S1_unit_guide);
 matrix_info= matrix_info(:, 1:3);
 
 
-%initiliase an array with maximum value for the each neuron or the maximum
+%initiliase an array with maximum value for the each neuron an or the maximum
 %shift
 max_neuron = zeros(96, 1);
 max_shift = zeros(96, 1);
@@ -311,13 +310,11 @@ all_indices_shift = (1:all_rows_shift);
 %concatenate the channel with the max_shift
 max_shift= horzcat(all_indices_shift', max_shift);
 
-
 %% display the maximum R_squared in the matrix and the maximum index at the correct location matrix
 %initialise R_squared_matrix
 R_squared_matrix = zeros(size(matrix_location));
 %initialise index matrix
 index_matrix = zeros(size(matrix_location));
-
 
 %loop over the rows of the matrix_location
 for rows = 1:size(matrix_location, 1)
@@ -357,7 +354,6 @@ colorbar;
 xlabel('columns')
 ylabel('rows')
 
-
 figure(6)
 colormap(colors);
 imagesc(index_matrix)
@@ -371,7 +367,6 @@ ylabel('rows')
 max_neuron_i = zeros(96, 1);
 %initialise R_squared_matrix
 R_squared_matrix1 = zeros(size(matrix_location));
-
 
 R_all_columns= mean(R_all,1);
 for i= 1:30
@@ -395,8 +390,6 @@ for i= 1:30
     %concatenate the channel with the max_neuron
     max_neuron_i= horzcat(all_indices', max_neuron_i);
 
-    %% display the maximum R_squared in the matrix 
- 
     %loop over the rows of the matrix_location
     for rows = 1:size(matrix_location, 1)
         %loop over the columns of the matrix_location
@@ -405,15 +398,15 @@ for i= 1:30
             %the value of that channel out of the second column of max_neuron.
             maximumvalue_i = max_neuron_i(max_neuron_i(:, 1) == matrix_location(rows, cols), 2);
        %account for empty values 
-        if isempty(maximumvalue_i)
-            R_squared_matrix1(rows, cols) = 0; 
-        else
-            %assign the maximum value of the neuron to the the R_squared
-            R_squared_matrix1(rows, cols) = maximumvalue_i;
-
-        end
+            if isempty(maximumvalue_i)
+                R_squared_matrix1(rows, cols) = 0; 
+            else
+                %assign the maximum value of the neuron to the the R_squared
+                R_squared_matrix1(rows, cols) = maximumvalue_i;
+            end
         end
     end
+
 figure(7)
 shiftclear_R_squared = R_squared_matrix1;
 shiftclear_R_squared(shiftclear_R_squared >.3) = 0.3;
