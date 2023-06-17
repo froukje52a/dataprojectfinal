@@ -236,27 +236,20 @@ title('-log10 of the p_values of the index against the 0 index, including 0 itse
 xlabel('shift');
 ylabel('-log10 p_values against the 0 index' );
 
-%preprocess the maximum neuron and R_squared for the location matrixes
-index= zeros(1,30);
-maximum_neuron= zeros(1,30);
 
 %% load preprocess the S1_unit_guide
-
-
-
-%load the the S1_unit guide
-
+%because of large file in github already extractecd S1_unit_guide
 %S1_unit_guide= trial_data.S1_unit_guide;  
 %save('S1_unit_guide.mat', 'S1_unit_guide');
+
+%load the the S1_unit guide
 %make it a double 
 load('S1_unit_guide.mat')
 S1_unit_guide= double(S1_unit_guide);
 %make the index starting from 1 instead of 0 for each neuron
 S1_unit_guide(:,2) = S1_unit_guide(:,2) + 1;
-unique_c = S1_unit_guide(:, 1); 
-numUniqueNumbers = numel(unique(unique_c));
-%% spatial analysation
 
+%% spatial analysation
 
 %Load the electrodes
 electrode = readtable('elec_map.csv');
@@ -290,9 +283,7 @@ for ch = 1:size(electrodes_h, 1)
        %only use the second and third row to put in the neurons at the
        %correct spot for each of the matching channels of neuron
        loc_channel(chan_index(neuron), :) = [channel, electrodes_h(ch, 2:3)];
-
-    end
-    
+    end  
 end
 
 %go over the loc_channel matrix and assign the correct row and column to
