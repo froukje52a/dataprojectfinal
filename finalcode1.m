@@ -361,9 +361,6 @@ ylabel('rows')
 
 
 figure(6)
-colors = colormap;
-%set nan value a different color
-colors(1, :) =  [0.5 0.5 0.5]; 
 colormap(colors);
 imagesc(index_matrix)
 colorbar;
@@ -436,15 +433,10 @@ shiftclear_R_squared(shiftclear_R_squared >.3) = 0.3;
 subplot(5, 6, i);
 imagesc(shiftclear_R_squared )
 shiftclear_R_squared (isnan(shiftclear_R_squared ))=0;
-colors = colormap;
-%set nan value a different color
-colors(1, :) =  [0.5 0.5 0.5]; 
 colormap(colors);
 imagesc(shiftclear_R_squared )
 title(i)
 end 
-
-
 
 %% mean overall performance at edifferent time points
 %taking the mean of each column
