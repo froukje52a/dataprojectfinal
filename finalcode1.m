@@ -213,14 +213,11 @@ xlabel('shift');
 ylabel('mean R^2 per row');
 %p_value_neuron= mean(p_values(:,:,mean)
 
-
 %only look at significant values
-R_all_sig= r2_mean_all(r2_mean_all(19,:)>0.05);
-R_all_sig_at0= mean(R_all_sig);
+%R_all_sig= r2_mean_all(r2_mean_all(19,:)>0.05);
+%R_all_sig_at0= mean(R_all_sig);
 
-%Wilcoxon signed-rank test comparing each column to the 0 value(even
-%though it is efference copy)
-
+%Wilcoxon signed-rank test comparing each column to the 0 value
 p_values_wilcoxon = zeros(113,1);
 for col_shift = 1:30
     %for neuron_coli= 1:113
@@ -255,65 +252,32 @@ S1_unit_guide(:,2) = S1_unit_guide(:,2) + 1;
 electrode = readtable('elec_map.csv');
 save('electrode.mat', 'electrode');
 
-%only get the "interesting" arrays of the matrix
+%only get the "interesting" arrays of the table
 electrodes = table2array(electrode(:, {'chan', 'rowNum', 'colNum'}));
-%matrix with column 1 all the channels, column 2 the rowNumbers and column
-
-%only get the informtaion of our monkey H, 113 neurons
-electrodes_h= electrodes(97:192, :);%monkey H is from 97-192
+%matrix with column 1 all the channels, column 2 the rowNumbers and
+%columnnumber
 
 %% make table into matrix with the channels in the correct place for the matrix
 
-%initialise the channels matrix which contains the channel and row and
-%column for every electrode
-loc_channel = zeros(size(f_rates,2),3);
+%only get the information of our monkey H, 113 neurons
+electrodes_h= electrodes(97:192, :);%monkey H is from 97-192
 
-%initialise the base matrix_location matrix
-matrix_location= zeros(10,10);
+%generate the matrix_location with its correct placement of the channels
+[loc_channel, matrix_location]= generate_matrix_location(f_rates, electrodes_h, S1_unit_guide);
 
-%loop over every channel
-for ch = 1:size(electrodes_h, 1)
-    %obtain the channel
-    channel = electrodes_h(ch, 1);
-    %find the indexes of neurons which have the same channel
-    chan_index = find(S1_unit_guide(:,1) == channel);
-    
-    %loop over set of indexes
-    for neuron = 1:length(chan_index)
-       %only use the second and third row to put in the neurons at the
-       %correct spot for each of the matching channels of neuron
-       loc_channel(chan_index(neuron), :) = [channel, electrodes_h(ch, 2:3)];
-    end  
-end
-
-%go over the loc_channel matrix and assign the correct row and column to
-%the channel number
-for neuron_idx = 1:size(loc_channel, 1)
-    %set the channel, row, col to the correct place
-    chan= loc_channel(neuron_idx, 1);
-    row=  loc_channel(neuron_idx, 2);
-    col=  loc_channel(neuron_idx, 3);
-    matrix_location(row, col) = chan;
-end
-
-%figure(3)
 %shows the loaction of the channels in the brain
 disp(matrix_location)
 
 
 %% line them up correctly the best_r with the 
-%for i= 1:30
-%    [maximum_neuron, index ] = max(R_all_columns(:,i,:), [], 2);
+%find the maximum of each neuron and its corresponding index
 [maximum_neuron, index ] = max(r2_mean_all);
 
 %preprocess the maximum neuron and R_squared for the location matrixes
 index= index(:, 1:end)';
 maximum_neuron= maximum_neuron(:, 1:end)';
-%the n inconsistent
-%maximum_neuron= maximum_neuron(maximum_neuron>.05)
+%concatenate maximum_neuron and index into best_r
 best_r= horzcat(index, maximum_neuron);
-
-
 
 %concatenatet the best_r with S1_unit_guide
 matrix_info= horzcat(best_r, S1_unit_guide);
@@ -335,7 +299,6 @@ max_neuron(1:size(grouped_vals, 1)) = grouped_vals;
 grouped_vals_shift = accumarray(matrix_info(:, 3), matrix_info(:, 1), [], @max);
 %set the maximum value of the grouped_vals_shift to each row coressponding to the channel
 max_shift(1:size(grouped_vals_shift, 1)) = grouped_vals_shift; 
-
 
 
 %%assign the channels to the values
@@ -618,3 +581,49 @@ B_weights = (X_tX + lambda_identity) \ (X_train.' * Y_train);
 Y_hat = X_validation*B_weights;
 lambda_mse= sum(mean(Y_hat-Y_validation)).^2;
 end
+
+function [loc_channel, matrix_location]= generate_matrix_location(f_rates, electrodes_h, S1_unit_guide)
+%%[loc_channel, matrix_location]= generate_matrix_location(f_rates, electrodes_h, S1_unit_guide)
+%input: loc_channel:firing rates for the neurons
+%       electrodes_h: electrodes of monkey h, its channel,row,column
+%       S1_unit_guide: validation y value, dependent(f_rated)
+%output: loc_channel: channel with its corresponding row and channel
+%        matrix_location: the channel nummber on the right location
+%the function uses the channel and its corresponding row and column of 
+%monkey h to make the loc_channel matrix for each electrode. and it uses
+%the loc_channel matrix gto make the matrix_location matrix, to get each
+%channel at the right spot.
+
+%initialise the channels matrix which contains the channel and row and
+%column for every electrode
+loc_channel = zeros(size(f_rates,2),3);
+
+%initialise the base matrix_location matrix
+matrix_location= zeros(10,10);
+
+
+%loop over every channel
+for ch = 1:size(electrodes_h, 1)
+    %obtain the channel
+    channel = electrodes_h(ch, 1);
+    %find the indexes of neurons which have the same channel
+    chan_index = find(S1_unit_guide(:,1) == channel);
+    
+    %loop over set of indexes
+    for neuron = 1:length(chan_index)
+       %only use the second and third row to put in the neurons at the
+       %correct spot for each of the matching channels of neuron
+       loc_channel(chan_index(neuron), :) = [channel, electrodes_h(ch, 2:3)];
+    end  
+end
+
+%go over the loc_channel matrix and assign the correct row and column to
+%the channel number
+for neuron_idx = 1:size(loc_channel, 1)
+    %set the channel, row, col to the correct place
+    chan= loc_channel(neuron_idx, 1);
+    row=  loc_channel(neuron_idx, 2);
+    col=  loc_channel(neuron_idx, 3);
+    matrix_location(row, col) = chan;
+end
+end 
