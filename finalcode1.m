@@ -158,7 +158,6 @@ for c= 1:number
             R_squared(neuron_idx,t,neurons_channel) = R(1,2)^2;
             p_values(neuron_idx,t, neurons_channel) = p(2,1);
         end
-        %[h0,p_t,c_I,test_stat] = ttest2(test_pred, test_f_rates);
    
         %store mse for optimal lambdas
         each_MSE(neuron_idx,t) = ridge_regression(train_kinematics, train_f_rates, validation_kinematics, validation_f_rates, optimal_lambda);
@@ -196,28 +195,24 @@ ylabel('R squared values')
 title('maximum R squared for eache neuron aligned and aligned cut off')
 legend('aligned', 'aligned cut off')
 
-
+%remove the first unnecessary dimension
 r2_mean_all = squeeze(mean(R_all, 1));
+
 %significance?
 %r2_mean_all = r2_mean_all(:,max(r2_mean_all)>.05);
 
+%mean value per shift
 r2_mean_all_rowindex= mean(r2_mean_all,2);
 
 %figure
 figure(3)
-%shows maximum of the mean R_squared of all the rows which are significant
+%shows the mean R_squared of all the rows which are significant
 plot(r2_mean_all_rowindex);
-title('maximum mean R squared of the signifcant elements per row');
+title('mean R squared of the signifcant elements per row');
 xlabel('shift');
 ylabel('mean R^2 per row');
 %p_value_neuron= mean(p_values(:,:,mean)
 
-
-%find the maximum of the mean
-%R_all_columns= mean(R_all,1);
-%R_all_columns= R_all_columns(R_all_columns>0.05);
-[maximum_neuron, index ] = max(r2_mean_all, [], 2);
-%[p,h,stats] = signrank(maximum_neuron,  R_all_columns(:,19,:));
 
 %only look at significant values
 R_all_sig= r2_mean_all(r2_mean_all(19,:)>0.05);
@@ -242,20 +237,8 @@ xlabel('shift');
 ylabel('-log10 p_values against the 0 index' );
 
 %preprocess the maximum neuron and R_squared for the location matrixes
-index= index(:, 1:end)';
-maximum_neuron= maximum_neuron(:, 1:end)';
-%the n inconsistent
-%maximum_neuron= maximum_neuron(maximum_neuron>.05)
-%best_r= horzcat(index, maximum_neuron);
-
-mean_index= mean(index);
-
-
-%standard deviation
-r2_std_all= std(maximum_neuron);
-%standard error
-r2_error = r2_std_all/sqrt(length(maximum_neuron));               
-t_score = tinv([0.025  0.975],length(maximum_neuron)-1);
+index= zeros(1,30);
+maximum_neuron= zeros(1,30);
 
 %% load preprocess the S1_unit_guide
 
