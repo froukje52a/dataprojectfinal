@@ -261,9 +261,6 @@ electrodes_h= electrodes(97:192, :);%monkey H is from 97-192
 %generate the matrix_location with its correct placement of the channels
 [loc_channel, matrix_location]= generate_matrix_location(f_rates, electrodes_h, S1_unit_guide);
 
-%shows the loaction of the channels in the brain
-disp(matrix_location)
-
 %% line them up correctly the maximum R squared of the mean values with the maximum index
 %find the maximum of each neuron and its corresponding index
 [maximum_neuron, index ] = max(r2_mean_all);
@@ -433,8 +430,6 @@ colorbar;
 title('<= -29.4 sensory feedback')
 xlabel('columns')
 ylabel('rows')
-
-
 
 %% plot the maximum shift index and its corresponding maximum R squared
 figure(9)
