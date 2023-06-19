@@ -436,37 +436,40 @@ xlabel('columns')
 ylabel('rows')
 
 %% plot the maximum shift index and its corresponding maximum R squared
+index_time_shift =(1:30)';
+max_index_and_neuron1= max_index_and_neuron;
 
-max_index_and_neuron1= zeros(113,2)
-for i= 1:30
-    if max_index_and_neuron1(i, 1) == time_shift_start
-    max_index_and_neuron1(i, 1) = time_shift_start(i)';
+%get starting value 
+sameindex = time_shift_start(index_time_shift);
+for i = 1:size(max_index_and_neuron1, 1)
+    if max_index_and_neuron1(i, 1) <= numel(sameindex)
+        max_index_and_neuron1(i, 1) = sameindex(max_index_and_neuron1(i, 1));
     end
-end 
+end
 
 figure(9)
-time_shift = unique(max_index_and_neuron(:, 1));  
+time_shift = unique(max_index_and_neuron1(:, 1));  
 maximum_r_at_time_shift = zeros(size(time_shift));  
 
 for i = 1:length(time_shift)
     %take the mean for multiple values of the same shift
-    maximum_r_at_time_shift(i) = mean(max_index_and_neuron(max_index_and_neuron(:, 1) == time_shift(i), 2)); 
+    maximum_r_at_time_shift(i) = mean(max_index_and_neuron1(max_index_and_neuron1(:, 1) == time_shift(i), 2)); 
 end
 
 bar(time_shift, maximum_r_at_time_shift);
-xlabel("shift index")
+xlabel("time shift start")
 ylabel('R2 values')
-title("max R2 at the shift index")
+title("max R2 at the time shift start")
 
 %% plot the number of maximum at that shift index of the max r squared 
 figure(10)
-shifts_number_val = max_index_and_neuron(:, 1);  
+shifts_number_val = max_index_and_neuron1(:, 1);  
 
-hist_bar = histogram(shifts_number_val);
+hist_bar = histogram(shifts_number_val, time_shift_start);
 count = hist_bar.BinCounts;
 edge = hist_bar.BinEdges;
 shift = (edge(1:end-1) + edge(2:end)) / 2;
-xlabel('shift index');
+xlabel('time shift start');
 ylabel('count');
 title('number of neurons in each bin')
 
