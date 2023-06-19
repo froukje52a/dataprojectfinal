@@ -94,7 +94,6 @@ number = 10;
 %each shift and each neuron
 R_all= zeros(number*K_fold, length(shifts), 113);
 
-
 %% perform the ridge regression for the different time shifts and folds
 %do it number(10) of times
 for c= 1:number
@@ -184,7 +183,6 @@ xlabel('neurons')
 ylabel('R squared values')
 title('maximum R squared for eache neuron aligned')
 
-
 %remove the first unnecessary dimension
 r2_mean_all = squeeze(mean(R_all, 1));
 
@@ -216,21 +214,18 @@ ylabel('-log10 p_values against the 0 index' );
 
 
 %% load preprocess the S1_unit_guide
-%because of large file in github already extractecd S1_unit_guide
+%because of large file in github I already extractecd S1_unit_guide
 %S1_unit_guide= trial_data.S1_unit_guide;  
 %save('S1_unit_guide.mat', 'S1_unit_guide');
 
 %load the the S1_unit guide
-%make it a double 
 load('S1_unit_guide.mat')
-S1_unit_guide= double(S1_unit_guide);
+S1_unit_guide= double(S1_unit_guide);%make it a double 
 %make the index starting from 1 instead of 0 for each neuron
 S1_unit_guide(:,2) = S1_unit_guide(:,2) + 1;
 
 %% spatial analysation
-
-%Load the electrodes
-electrode = readtable('elec_map.csv');
+electrode = readtable('elec_map.csv');%Load the electrodes
 save('electrode.mat', 'electrode');
 
 %only get the "interesting" arrays of the table
@@ -259,7 +254,6 @@ max_index_and_neuron= horzcat(index, maximum_neuron);
 matrix_info= horzcat(max_index_and_neuron, S1_unit_guide);
 %remove the fourth column because not of interest here
 matrix_info= matrix_info(:, 1:3);
-
 
 %initiliase an array with maximum value for the each neuron an or the maximum
 %shift
@@ -323,7 +317,6 @@ end
 figure(4)
 clear_R_squared = R_squared_matrix;
 clear_R_squared (clear_R_squared >.3) = 0.3;
-%subplot(6, 5, i);
 imagesc(clear_R_squared )
 clear_R_squared (isnan(clear_R_squared ))=0;
 imagesc(clear_R_squared )
