@@ -103,11 +103,11 @@ for c= 1:number
             %start with the initial kinematics
             kinematics_shift= kinematics;
             f_rates_shift= f_rates;
-            %for the efference values
+            %forward estimation values
             if shifts(t) < 0
               kinematics_shift= kinematics_shift(1:(end+shifts(t)), :);
               f_rates_shift= f_rates_shift(1-shifts(t):end, :);
-            %for the sensory feedback
+            %sensory feedback values
             elseif shifts(t) > 0
             kinematics_shift=kinematics_shift(shifts(t)+1:end, :);
             f_rates_shift= f_rates_shift(1:(end-shifts(t)), :);
@@ -425,17 +425,6 @@ index_matrix(index_matrix == 0) = NaN;
 figure(8);
 index_visual_matrix = zeros(10,10);
 index_visual_matrix(isnan(index_matrix)) = 0;
-subplot(1, 3, 1);
-index_visual_matrix(index_matrix <= 14) = 1;
-index_visual_matrix(index_matrix > 14 ) = 2;
-colormap(colors);
-imagesc(index_visual_matrix);
-colorbar;
-title('<=- 49 sensory feedback')
-xlabel('columns')
-ylabel('rows')
-
-subplot(1, 3, 2);
 index_visual_matrix(index_matrix <= 16) = 1;
 index_visual_matrix(index_matrix > 16 ) = 2; 
 colormap(colors);
@@ -445,15 +434,6 @@ title('<= -29.4 sensory feedback')
 xlabel('columns')
 ylabel('rows')
 
-subplot(1, 3, 3);
-index_visual_matrix(index_matrix <= 18) = 1;
-index_visual_matrix(index_matrix > 18 ) = 2;
-imagesc(index_visual_matrix); 
-colormap(colors);
-colorbar;
-title('<= -9.8 sensory feedback')
-xlabel('columns')
-ylabel('rows')
 
 
 %% plot the maximum shift index and its corresponding maximum R squared
