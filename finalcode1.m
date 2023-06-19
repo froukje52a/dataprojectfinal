@@ -58,6 +58,8 @@ shifts = [-18,-17,-16,-15,-14,-13,-12, -11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,
 %[25] = (6, 58.8 to 68.6)     [26] = (7, 68.6 to 78.4)    [27] = (8, 78.4 to 88.2)
 %[28] = (9, 88.2 to 98.0)     [29] = (10, 98.0 to 107.8)  [30] = (11, 107.8 to end)
 
+time_shift_start= [-176.4, -166.6, -156.8, -147.0, -137.2, -127.4, -117.6, -107.8, -98.0, -88.2, -78.4, -68.6, -58.8, -49.0, -39.2, -29.4, -19.6, -9.8, 0, 9.8, 19.6, 29.4, 39.2, 49.0, 58.8, 68.6, 78.4, 88.2, 98.0, 107.8];
+
 %cross-validation on 10 folds
 K_fold = 10;
 
@@ -412,7 +414,7 @@ imagesc(shiftclear_R_squared )
 shiftclear_R_squared (isnan(shiftclear_R_squared ))=0;
 colormap(colors);
 imagesc(shiftclear_R_squared )
-title(i)
+title(time_shift_start(i))
 end 
 
 %% mean overall performance at edifferent time points
