@@ -176,9 +176,7 @@ mean_mse= mean(each_MSE);
 R2_0offset= R_squared(:,19,:);
 %mean when in null offset
 R2_mean_0offset= squeeze(mean(R2_0offset));
-R2_mean_0offset_cutoff= R2_mean_0offset(R2_mean_0offset>0.05);
 value_R2_mean_0offset= mean(R2_mean_0offset);
-value_R2_mean_0offset_cutoff= mean(R2_mean_0offset_cutoff);
 
 figure(1)
 plot(R2_mean_0offset)
@@ -186,35 +184,19 @@ xlabel('neurons')
 ylabel('R squared values')
 title('maximum R squared for eache neuron aligned')
 
-figure(2)
-plot(R2_mean_0offset)
-hold on;
-plot(R2_mean_0offset_cutoff)
-xlabel('neurons')
-ylabel('R squared values')
-title('maximum R squared for eache neuron aligned and aligned cut off')
-legend('aligned', 'aligned cut off')
 
 %remove the first unnecessary dimension
 r2_mean_all = squeeze(mean(R_all, 1));
 
-%significance?
-%r2_mean_all = r2_mean_all(:,max(r2_mean_all)>.05);
-
 %mean value per shift
 r2_mean_all_index= mean(r2_mean_all,2);
 
-figure(3)
+figure(2)
 %shows the mean R_squared per shift index 
 plot(time_shift_start, r2_mean_all_index);
 title('mean R squared of the slements per time shift');
 xlabel('time shift start');
 ylabel('mean R^2 per time shift');
-
-
-%only look at significant values
-%R_all_sig= r2_mean_all(r2_mean_all(19,:)>0.05);
-%R_all_sig_at0= mean(R_all_sig);
 
 %Wilcoxon signed-rank test comparing each column to the 0 value
 p_values_wilcoxon = zeros(30,1);
@@ -225,7 +207,7 @@ for col_shift = 1:30
 end
 p_values_log = -log10(p_values_wilcoxon);
 
-figure(4)
+figure(3)
 %shows the wilcoxon signed rank test, comparing all the indexes maximum 
 plot(time_shift_start, p_values_log);
 title('-log10 of the p_values of the time shift against the 0 index, including 0 itself');
@@ -338,7 +320,7 @@ for rows = 1:size(matrix_location, 1)
     end
 end
 %%
-figure(5)
+figure(4)
 clear_R_squared = R_squared_matrix;
 clear_R_squared (clear_R_squared >.3) = 0.3;
 %subplot(6, 5, i);
@@ -350,17 +332,10 @@ colors = colormap;
 colors(1, :) =  [0.5 0.5 0.5]; 
 colormap(colors);
 colorbar;
-title('R_squared in null offset ')
+title('R squared in null offset ')
 xlabel('columns')
 ylabel('rows')
 
-figure(6)
-colormap(colors);
-imagesc(index_matrix)
-colorbar;
-title("index?")
-xlabel('columns')
-ylabel('rows')
 
 %%
 %initiliase an array with maximum value for the each neuron or the maximum
@@ -408,7 +383,7 @@ for i= 1:30
         end
     end
 
-figure(7)
+figure(5)
 shiftclear_R_squared = R_squared_matrix1;
 shiftclear_R_squared(shiftclear_R_squared >.3) = 0.3;
 subplot(5, 6, i);
@@ -423,7 +398,7 @@ end
 %taking the mean of each column
 index_matrix(index_matrix == 0) = NaN;
 
-figure(8);
+figure(6);
 index_visual_matrix = zeros(10,10);
 index_visual_matrix(isnan(index_matrix)) = 0;
 index_visual_matrix(index_matrix < 16) = 1;
@@ -447,7 +422,7 @@ for i = 1:size(max_index_and_neuron1, 1)
     end
 end
 
-figure(9)
+figure(7)
 time_shift = unique(max_index_and_neuron1(:, 1));  
 maximum_r_at_time_shift = zeros(size(time_shift));  
 
@@ -462,7 +437,7 @@ ylabel('R2 values')
 title("max R2 at the time shift start")
 
 %% plot the number of maximum at that shift index of the max r squared 
-figure(10)
+figure(8)
 shifts_number_val = max_index_and_neuron1(:, 1);  
 
 hist_bar = histogram(shifts_number_val, time_shift_start);
