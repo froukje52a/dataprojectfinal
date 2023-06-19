@@ -206,10 +206,10 @@ r2_mean_all_index= mean(r2_mean_all,2);
 
 figure(3)
 %shows the mean R_squared per shift index 
-plot(r2_mean_all_index);
-title('mean R squared of the slements per shift index');
-xlabel('shift');
-ylabel('mean R^2 per shift index');
+plot(time_shift_start, r2_mean_all_index);
+title('mean R squared of the slements per time shift');
+xlabel('time shift start');
+ylabel('mean R^2 per time shift');
 
 
 %only look at significant values
@@ -217,7 +217,7 @@ ylabel('mean R^2 per shift index');
 %R_all_sig_at0= mean(R_all_sig);
 
 %Wilcoxon signed-rank test comparing each column to the 0 value
-p_values_wilcoxon = zeros(113,1);
+p_values_wilcoxon = zeros(30,1);
 for col_shift = 1:30
     %for neuron_coli= 1:113
         [p_values_wilcoxon(col_shift), ~] = signrank(r2_mean_all(col_shift,:), r2_mean_all(19,:));
@@ -227,9 +227,9 @@ p_values_log = -log10(p_values_wilcoxon);
 
 figure(4)
 %shows the wilcoxon signed rank test, comparing all the indexes maximum 
-plot(p_values_log);
-title('-log10 of the p_values of the index against the 0 index, including 0 itself');
-xlabel('shift');
+plot(time_shift_start, p_values_log);
+title('-log10 of the p_values of the time shift against the 0 index, including 0 itself');
+xlabel('time shift start');
 ylabel('-log10 p_values against the 0 index' );
 
 
@@ -350,6 +350,7 @@ colors = colormap;
 colors(1, :) =  [0.5 0.5 0.5]; 
 colormap(colors);
 colorbar;
+title('R_squared in null offset ')
 xlabel('columns')
 ylabel('rows')
 
@@ -357,6 +358,7 @@ figure(6)
 colormap(colors);
 imagesc(index_matrix)
 colorbar;
+title("index?")
 xlabel('columns')
 ylabel('rows')
 
@@ -434,18 +436,21 @@ xlabel('columns')
 ylabel('rows')
 
 %% plot the maximum shift index and its corresponding maximum R squared
-figure(9)
-%concatenate the max_index_and_neuron with S1_unit_guide
-histogram_info= horzcat(max_index_and_neuron, S1_unit_guide);
-%remove the fourth column
-histogram_info= histogram_info(:, 1:2);
 
-time_shift = unique(histogram_info(:, 1));  
+max_index_and_neuron1= zeros(113,2)
+for i= 1:30
+    if max_index_and_neuron1(i, 1) == time_shift_start
+    max_index_and_neuron1(i, 1) = time_shift_start(i)';
+    end
+end 
+
+figure(9)
+time_shift = unique(max_index_and_neuron(:, 1));  
 maximum_r_at_time_shift = zeros(size(time_shift));  
 
 for i = 1:length(time_shift)
     %take the mean for multiple values of the same shift
-    maximum_r_at_time_shift(i) = mean(histogram_info(histogram_info(:, 1) == time_shift(i), 2)); 
+    maximum_r_at_time_shift(i) = mean(max_index_and_neuron(max_index_and_neuron(:, 1) == time_shift(i), 2)); 
 end
 
 bar(time_shift, maximum_r_at_time_shift);
@@ -455,7 +460,7 @@ title("max R2 at the shift index")
 
 %% plot the number of maximum at that shift index of the max r squared 
 figure(10)
-shifts_number_val = histogram_info(:, 1);  
+shifts_number_val = max_index_and_neuron(:, 1);  
 
 hist_bar = histogram(shifts_number_val);
 count = hist_bar.BinCounts;
