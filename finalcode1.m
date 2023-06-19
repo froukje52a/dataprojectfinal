@@ -207,7 +207,7 @@ figure(3)
 plot(r2_mean_all_index);
 title('mean R squared of the slements per shift index');
 xlabel('shift');
-ylabel('mean R^2 per shift');
+ylabel('mean R^2 per shift index');
 
 
 %only look at significant values
