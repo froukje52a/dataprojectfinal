@@ -200,15 +200,15 @@ r2_mean_all = squeeze(mean(R_all, 1));
 %r2_mean_all = r2_mean_all(:,max(r2_mean_all)>.05);
 
 %mean value per shift
-r2_mean_all_rowindex= mean(r2_mean_all,2);
+r2_mean_all_index= mean(r2_mean_all,2);
 
 figure(3)
-%shows the mean R_squared of all the rows which are significant
-plot(r2_mean_all_rowindex);
-title('mean R squared of the signifcant elements per row');
+%shows the mean R_squared per shift index 
+plot(r2_mean_all_index);
+title('mean R squared of the slements per shift index');
 xlabel('shift');
-ylabel('mean R^2 per row');
-%p_value_neuron= mean(p_values(:,:,mean)
+ylabel('mean R^2 per shift');
+
 
 %only look at significant values
 %R_all_sig= r2_mean_all(r2_mean_all(19,:)>0.05);
