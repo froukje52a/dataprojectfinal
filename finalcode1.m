@@ -208,9 +208,14 @@ p_values_log = -log10(p_values_wilcoxon);
 figure(3)
 %shows the wilcoxon signed rank test, comparing all the indexes maximum 
 plot(time_shift_start, p_values_log);
+hold on;
+significance= -log10(0.05);
+yline(significance)
+hold off;
 title('-log10 of the p_values of the time shift against the 0 index, including 0 itself');
 xlabel('time shift start');
 ylabel('-log10 p_values against the 0 index' );
+legend('-log10 of the p values', '-log10(0.05)')
 
 
 %% load preprocess the S1_unit_guide
