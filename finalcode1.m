@@ -45,8 +45,8 @@ kinematics = [hand_pos, hand_vel];
 %preprocess kinematics
 kinematics= kinematics- mean(kinematics);
 
-%set all the possible shifts of forward estimation and sensory feedback
-shifts = [-18,-17,-16,-15,-14,-13,-12, -11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11];
+%set all the possible offsets of forward estimation and sensory feedback
+offsets = [-18,-17,-16,-15,-14,-13,-12, -11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11];
 %[1] = (-18, -176.4 to -166.6) [2] = (-17, -166.6 to -156.8) [3] = (-16, -156.8 to -147.0) 
 %[4] = (-15, -147.0 to -137.2) [5] = (-14, -137.2 to -127.4) [6] = (-13, -127.4 to -117.6)
 %[7] = (-12, -117.6 to -107.8) [8] = (-11, -107.8 to -98.0)  [9] = (-10, -98.0 to -88.2)
@@ -58,7 +58,7 @@ shifts = [-18,-17,-16,-15,-14,-13,-12, -11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,
 %[25] = (6, 58.8 to 68.6)     [26] = (7, 68.6 to 78.4)    [27] = (8, 78.4 to 88.2)
 %[28] = (9, 88.2 to 98.0)     [29] = (10, 98.0 to 107.8)  [30] = (11, 107.8 to end)
 
-time_shift_start= [-176.4, -166.6, -156.8, -147.0, -137.2, -127.4, -117.6, -107.8, -98.0, -88.2, -78.4, -68.6, -58.8, -49.0, -39.2, -29.4, -19.6, -9.8, 0, 9.8, 19.6, 29.4, 39.2, 49.0, 58.8, 68.6, 78.4, 88.2, 98.0, 107.8];
+time_offsets_start= [-176.4, -166.6, -156.8, -147.0, -137.2, -127.4, -117.6, -107.8, -98.0, -88.2, -78.4, -68.6, -58.8, -49.0, -39.2, -29.4, -19.6, -9.8, 0, 9.8, 19.6, 29.4, 39.2, 49.0, 58.8, 68.6, 78.4, 88.2, 98.0, 107.8];
 
 %cross-validation on 10 folds
 K_fold = 10;
@@ -77,49 +77,49 @@ ub=1;
 options = optimoptions(@fmincon,'Display','off');
 
 %intiliase lambdas and MSE
-lambdas= zeros(K_fold, length(shifts));
-each_MSE= zeros(K_fold, length(shifts));
+lambdas= zeros(K_fold, length(offsets));
+each_MSE= zeros(K_fold, length(offsets));
 
 %initilaise allinds
 allInds = 1:K_fold;
 
 %intialise p_values and R_squared
-p_values = zeros(K_fold,length(shifts));
-R_squared = zeros(K_fold, length(shifts));
+p_values = zeros(K_fold,length(offsets));
+R_squared = zeros(K_fold, length(offsets));
 
 %number of r squared values per fold
 number = 10;
 
 %initialise R_all, all the R_squared values of for each fold*number for
 %each offset and each neuron
-R_all= zeros(number*K_fold, length(shifts), 113);
+R_all= zeros(number*K_fold, length(offsets), 113);
 
 %% perform the ridge regression for the different offsets and folds
 %do it number(10) of times
 for c= 1:number
     %loop over each fold crossvalidation
     for neuron_idx  = 1:K_fold  
-        %go over each shift value
-        for t=1:length(shifts)
+        %go over each offset value
+        for t=1:length(offsets)
             %start with the initial kinematics
-            kinematics_shift= kinematics;
-            f_rates_shift= f_rates;
+            kinematics_offset= kinematics;
+            f_rates_offset= f_rates;
             %forward estimation values
-            if shifts(t) < 0
-              kinematics_shift= kinematics_shift(1:(end+shifts(t)), :);
-              f_rates_shift= f_rates_shift(1-shifts(t):end, :);
+            if offsets(t) < 0
+              kinematics_offset= kinematics_offset(1:(end+offsets(t)), :);
+              f_rates_offset= f_rates_offset(1-offsets(t):end, :);
             %sensory feedback values
-            elseif shifts(t) > 0
-            kinematics_shift=kinematics_shift(shifts(t)+1:end, :);
-            f_rates_shift= f_rates_shift(1:(end-shifts(t)), :);
-            %if the kinematics are not shifted
+            elseif offsets(t) > 0
+            kinematics_offset=kinematics_offset(offsets(t)+1:end, :);
+            f_rates_offset= f_rates_offset(1:(end-offsets(t)), :);
+            %if the kinematics are null offset
             else
-                kinematics_shift= kinematics;
-                f_rates_shift= f_rates;
+                kinematics_offset= kinematics;
+                f_rates_offset= f_rates;
             end
     
         %needs to change for every offset
-        n = size(kinematics_shift, 1);
+        n = size(kinematics_offset, 1);
         indices = crossvalind('Kfold', n, K_fold);
     
         %split data into train, test and validation indices
@@ -130,12 +130,12 @@ for c= 1:number
         test = (indices == neuron_idx); 
    
         %split data into train, test and validation
-        train_kinematics = kinematics_shift(train, :);
-        train_f_rates =  f_rates_shift(train, :);
-        validation_kinematics = kinematics_shift(validation, :);
-        validation_f_rates =  f_rates_shift(validation, :);
-        test_kinematics = kinematics_shift(test, :);
-        test_f_rates =  f_rates_shift(test, :);
+        train_kinematics = kinematics_offset(train, :);
+        train_f_rates =  f_rates_offset(train, :);
+        validation_kinematics = kinematics_offset(validation, :);
+        validation_f_rates =  f_rates_offset(validation, :);
+        test_kinematics = kinematics_offset(test, :);
+        test_f_rates =  f_rates_offset(test, :);
 
         %use ridge regression function and fmincon to find optimal values for
         %lambda
@@ -143,7 +143,7 @@ for c= 1:number
         MSE = @(lambda) ridge_regression(train_kinematics, train_f_rates, validation_kinematics, validation_f_rates, lambda);
         [optimal_lambda, fval] = fmincon(MSE,0, A, b, Aeq, beq, lb, ub, [], options);
 
-        %store the optimal lambdas for each fold and every shift
+        %store the optimal lambdas for each fold and every offset
         lambdas(neuron_idx,t) = optimal_lambda;
         
         %find optimal weights and minimum of squared errors for the lambda
@@ -151,8 +151,8 @@ for c= 1:number
         %predict firing rate
         test_pred = test_kinematics * B_weights;
         
-        %calculate for each fold and shift
-        for neurons_channel = 1:size(f_rates_shift, 2)
+        %calculate for each fold and offset
+        for neurons_channel = 1:size(f_rates_offset, 2)
             [R,p] = corrcoef(test_pred(:,neurons_channel), test_f_rates(:,neurons_channel));
             R_squared(neuron_idx,t,neurons_channel) = R(1,2)^2;
             p_values(neuron_idx,t, neurons_channel) = p(2,1);
@@ -185,32 +185,32 @@ xlabel('neurons')
 ylabel('R squared values')
 title('maximum R squared for each neuron aligned')
 
-%mean value per shift
+%mean value per offset
 r2_mean_all_offset= mean(r2_mean_all,2);
 
 figure(2)
-%shows the mean R_squared per shift index 
-plot(time_shift_start, r2_mean_all_offset);
-title('mean R squared  time shift');
-xlabel('time shift start');
-ylabel('mean R^2 per time shift');
+%shows the mean R_squared per offset index 
+plot(time_offsets_start, r2_mean_all_offset);
+title('mean R squared  per offset');
+xlabel('time offset start');
+ylabel('mean R^2 per per offset');
 
 %Wilcoxon signed-rank test comparing each column to the 0 value
 p_values_wilcoxon = zeros(30,1);
-for col_shift = 1:30
-        [p_values_wilcoxon(col_shift), ~] = signrank(r2_mean_all(col_shift,:), r2_mean_all(19,:));
+for col_offset = 1:30
+        [p_values_wilcoxon(col_offset), ~] = signrank(r2_mean_all(col_offset,:), r2_mean_all(19,:));
 end
 p_values_log = -log10(p_values_wilcoxon);
 
 figure(3)
 %shows the wilcoxon signed rank test, comparing all the indexes maximum 
-plot(time_shift_start, p_values_log);
+plot(time_offsets_start, p_values_log);
 hold on;
 significance= -log10(0.05);
 yline(significance)
 hold off;
-title('-log10 of the p_values of the time shift against the 0 index, including 0 itself');
-xlabel('time shift start');
+title('-log10 of the p_values of the time offset against the 0 index, including 0 itself');
+xlabel('time offset start');
 ylabel('-log10 p_values against the 0 index' );
 legend('-log10 of the p values', '-log10(0.05)')
 
@@ -258,9 +258,9 @@ matrix_info= horzcat(max_index_and_neuron, S1_unit_guide);
 matrix_info= matrix_info(:, 1:3);
 
 %initiliase an array with maximum value for the each neuron an or the maximum
-%shift
+%offset
 max_neuron = zeros(96, 1);
-max_shift = zeros(96, 1);
+max_offset = zeros(96, 1);
 
 %keeps only the maximum value of mean values of the R2 and its corresponding index 
 %if there are multiple neurons in one channel 
@@ -272,9 +272,9 @@ grouped_vals = accumarray(matrix_info(:, 3), matrix_info(:, 2), [], @max);
 max_neuron(1:size(grouped_vals, 1)) = grouped_vals; 
 
 %use accumarray to group the first and third collumn and find its max between them 
-grouped_vals_shift = accumarray(matrix_info(:, 3), matrix_info(:, 1), [], @max);
-%set the maximum value of the grouped_vals_shift to each row coressponding to the channel
-max_shift(1:size(grouped_vals_shift, 1)) = grouped_vals_shift; 
+grouped_vals_offset = accumarray(matrix_info(:, 3), matrix_info(:, 1), [], @max);
+%set the maximum value of the grouped_vals_offset to each row coressponding to the channel
+max_offset(1:size(grouped_vals_offset, 1)) = grouped_vals_offset; 
 
 %%assign the channels to the values
 all_rows = size(max_neuron, 1);
@@ -282,10 +282,10 @@ all_indices = (1:all_rows);
 %concatenate the channel with the max_neuron
 max_neuron= horzcat(all_indices', max_neuron);
 
-all_rows_shift = size(max_shift, 1);
-all_indices_shift = (1:all_rows_shift);
-%concatenate the channel with the max_shift
-max_shift= horzcat(all_indices_shift', max_shift);
+all_rows_offset = size(max_offset, 1);
+all_indices_offset = (1:all_rows_offset);
+%concatenate the channel with the max_offset
+max_offset= horzcat(all_indices_offset', max_offset);
 
 %% display the maximum R_squared in the matrix and the maximum index at the correct location matrix
 %initialise R_squared_matrix
@@ -300,18 +300,18 @@ for rows = 1:size(matrix_location, 1)
         %compare the channel of max_neuron with the matrix location and obtain 
         %the value of that channel out of the second column of max_neuron.
         maximumvalue_neuron = max_neuron(max_neuron(:, 1) == matrix_location(rows, cols), 2);
-        %compare the channel of max_shift with the matrix location and obtain 
-        %the value of that channel out of the second column of max_shift.
-        index_shift = max_shift(max_shift(:, 1) == matrix_location(rows, cols), 2);
+        %compare the channel of max_offset with the matrix location and obtain 
+        %the value of that channel out of the second column of max_offset.
+        index_offset = max_offset(max_offset(:, 1) == matrix_location(rows, cols), 2);
         %account for empty values 
-        if isempty(maximumvalue_neuron) || isempty(index_shift)
+        if isempty(maximumvalue_neuron) || isempty(index_offset)
             R_squared_matrix(rows, cols) = 0; 
             index_matrix(rows, cols) = 0;
         else
             %assign the maximum value of the neuron to the the R_squared
             %matrix and tot the index_matrix
             R_squared_matrix(rows, cols) = maximumvalue_neuron;
-            index_matrix(rows, cols) = index_shift;
+            index_matrix(rows, cols) = index_offset;
         end
     end
 end
@@ -334,7 +334,7 @@ ylabel('rows')
 
 %%
 %initiliase an array with maximum value for the each neuron or the maximum
-%shift
+%offset
 max_neuron_i = zeros(96, 1);
 %initialise R_squared_matrix
 R_squared_matrix1 = zeros(size(matrix_location));
@@ -379,14 +379,14 @@ for i= 1:30
     end
 
 figure(5)
-shiftclear_R_squared = R_squared_matrix1;
-shiftclear_R_squared(shiftclear_R_squared >.3) = 0.3;
+clear_R_squared_offset = R_squared_matrix1;
+clear_R_squared_offset(clear_R_squared_offset >.3) = 0.3;
 subplot(5, 6, i);
-imagesc(shiftclear_R_squared )
-shiftclear_R_squared (isnan(shiftclear_R_squared ))=0;
+imagesc(clear_R_squared_offset )
+clear_R_squared_offset (isnan(clear_R_squared_offset ))=0;
 colormap(colors);
-imagesc(shiftclear_R_squared )
-title(time_shift_start(i))
+imagesc(clear_R_squared_offset )
+title(time_offsets_start(i))
 end 
 
 %% mean overall performance at edifferent time points
@@ -405,12 +405,12 @@ title('<= -29.4 sensory feedback')
 xlabel('columns')
 ylabel('rows')
 
-%% plot the maximum shift index and its corresponding maximum R squared
-index_time_shift =(1:30)';
+%% plot the maximum offset index and its corresponding maximum R squared
+index_time_offset =(1:30)';
 max_index_and_neuron1= max_index_and_neuron;
 
 %get starting value 
-sameindex = time_shift_start(index_time_shift);
+sameindex = time_offsets_start(index_time_offset);
 for i = 1:size(max_index_and_neuron1, 1)
     if max_index_and_neuron1(i, 1) <= numel(sameindex)
         max_index_and_neuron1(i, 1) = sameindex(max_index_and_neuron1(i, 1));
@@ -418,28 +418,28 @@ for i = 1:size(max_index_and_neuron1, 1)
 end
 
 figure(7)
-time_shift = unique(max_index_and_neuron1(:, 1));  
-maximum_r_at_time_shift = zeros(size(time_shift));  
+time_offset = unique(max_index_and_neuron1(:, 1));  
+maximum_r_at_time_offset = zeros(size(time_offset));  
 
-for i = 1:length(time_shift)
-    %take the mean for multiple values of the same shift
-    maximum_r_at_time_shift(i) = mean(max_index_and_neuron1(max_index_and_neuron1(:, 1) == time_shift(i), 2)); 
+for i = 1:length(time_offset)
+    %take the mean for multiple values of the same offset
+    maximum_r_at_time_offset(i) = mean(max_index_and_neuron1(max_index_and_neuron1(:, 1) == time_offset(i), 2)); 
 end
 
-bar(time_shift, maximum_r_at_time_shift);
-xlabel("time shift start")
+bar(time_offset, maximum_r_at_time_offset);
+xlabel("time offset start")
 ylabel('R2 values')
-title("max R2 at the time shift start")
+title("max R2 at the time offset start")
 
-%% plot the number of maximum at that shift index of the max r squared 
+%% plot the number of maximum at that offset index of the max r squared 
 figure(8)
-shifts_number_val = max_index_and_neuron1(:, 1);  
+number_val = max_index_and_neuron1(:, 1);  
 
-hist_bar = histogram(shifts_number_val, time_shift_start);
+hist_bar = histogram(number_val, time_offsets_start);
 count = hist_bar.BinCounts;
 edge = hist_bar.BinEdges;
-shift = (edge(1:end-1) + edge(2:end)) / 2;
-xlabel('time shift start');
+offset = (edge(1:end-1) + edge(2:end)) / 2;
+xlabel('time offset start');
 ylabel('count');
 title('number of neurons in each bin')
 
