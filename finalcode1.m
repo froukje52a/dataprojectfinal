@@ -45,7 +45,7 @@ kinematics = [hand_pos, hand_vel];
 %preprocess kinematics
 kinematics= kinematics- mean(kinematics);
 
-%set all the possible shifts of the efference copy and sensory feedback
+%set all the possible shifts of forward estimation and sensory feedback
 shifts = [-18,-17,-16,-15,-14,-13,-12, -11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11];
 %[1] = (-18, -176.4 to -166.6) [2] = (-17, -166.6 to -156.8) [3] = (-16, -156.8 to -147.0) 
 %[4] = (-15, -147.0 to -137.2) [5] = (-14, -137.2 to -127.4) [6] = (-13, -127.4 to -117.6)
@@ -91,15 +91,15 @@ R_squared = zeros(K_fold, length(shifts));
 number = 10;
 
 %initialise R_all, all the R_squared values of for each fold*number for
-%each shift and each neuron
+%each offset and each neuron
 R_all= zeros(number*K_fold, length(shifts), 113);
 
-%% perform the ridge regression for the different time shifts and folds
+%% perform the ridge regression for the different offsets and folds
 %do it number(10) of times
 for c= 1:number
     %loop over each fold crossvalidation
     for neuron_idx  = 1:K_fold  
-        %go over each shift
+        %go over each shift value
         for t=1:length(shifts)
             %start with the initial kinematics
             kinematics_shift= kinematics;
@@ -118,7 +118,7 @@ for c= 1:number
                 f_rates_shift= f_rates;
             end
     
-        %needs to change for every shift
+        %needs to change for every offset
         n = size(kinematics_shift, 1);
         indices = crossvalind('Kfold', n, K_fold);
     
@@ -168,31 +168,30 @@ for c= 1:number
 end
 %% analyse the R_squared
 
-%mean Mse
+%mean MSE
 mean_mse= mean(each_MSE);
 
+%remove the first unnecessary dimension
+r2_mean_all = squeeze(mean(R_all, 1));
+
 %null offset R_squared 
-R2_0offset= R_squared(:,19,:);
-%mean when in null offset
-R2_mean_0offset= squeeze(mean(R2_0offset));
+R2_mean_0offset= r2_mean_all(19,:);
+%mean value over all 113 neurons
 value_R2_mean_0offset= mean(R2_mean_0offset);
 
 figure(1)
 plot(R2_mean_0offset)
 xlabel('neurons')
 ylabel('R squared values')
-title('maximum R squared for eache neuron aligned')
-
-%remove the first unnecessary dimension
-r2_mean_all = squeeze(mean(R_all, 1));
+title('maximum R squared for each neuron aligned')
 
 %mean value per shift
-r2_mean_all_index= mean(r2_mean_all,2);
+r2_mean_all_offset= mean(r2_mean_all,2);
 
 figure(2)
 %shows the mean R_squared per shift index 
-plot(time_shift_start, r2_mean_all_index);
-title('mean R squared of the slements per time shift');
+plot(time_shift_start, r2_mean_all_offset);
+title('mean R squared  time shift');
 xlabel('time shift start');
 ylabel('mean R^2 per time shift');
 
