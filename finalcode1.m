@@ -198,9 +198,7 @@ ylabel('mean R^2 per time shift');
 %Wilcoxon signed-rank test comparing each column to the 0 value
 p_values_wilcoxon = zeros(30,1);
 for col_shift = 1:30
-    %for neuron_coli= 1:113
         [p_values_wilcoxon(col_shift), ~] = signrank(r2_mean_all(col_shift,:), r2_mean_all(19,:));
-    %end
 end
 p_values_log = -log10(p_values_wilcoxon);
 
