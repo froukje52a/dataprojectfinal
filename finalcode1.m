@@ -284,8 +284,6 @@ all_indices_offset = (1:all_rows_offset);
 max_offset= horzcat(all_indices_offset', max_offset);
 
 %% display the maximum R_squared in the matrix and the maximum index at the correct location matrix
-%initialise R_squared_matrix
-R_squared_matrix = zeros(size(matrix_location));
 %initialise index matrix
 index_matrix = zeros(size(matrix_location));
 
@@ -293,40 +291,18 @@ index_matrix = zeros(size(matrix_location));
 for rows = 1:size(matrix_location, 1)
     %loop over the columns of the matrix_location
     for cols = 1:size(matrix_location, 2)
-        %compare the channel of max_neuron with the matrix location and obtain 
-        %the value of that channel out of the second column of max_neuron.
-        maximumvalue_neuron = max_neuron(max_neuron(:, 1) == matrix_location(rows, cols), 2);
         %compare the channel of max_offset with the matrix location and obtain 
         %the value of that channel out of the second column of max_offset.
         index_offset = max_offset(max_offset(:, 1) == matrix_location(rows, cols), 2);
         %account for empty values 
-        if isempty(maximumvalue_neuron) || isempty(index_offset)
-            R_squared_matrix(rows, cols) = 0; 
+        if isempty(index_offset)
             index_matrix(rows, cols) = 0;
         else
-            %assign the maximum value of the neuron to the the R_squared
-            %matrix and tot the index_matrix
-            R_squared_matrix(rows, cols) = maximumvalue_neuron;
+            %assign the maximum value of the neuron to index_matrix
             index_matrix(rows, cols) = index_offset;
         end
     end
 end
-%%
-figure(4)
-clear_R_squared = R_squared_matrix;
-clear_R_squared (clear_R_squared >.3) = 0.3;
-imagesc(clear_R_squared )
-clear_R_squared (isnan(clear_R_squared ))=0;
-imagesc(clear_R_squared )
-colors = colormap;
-%set nan value a different color
-colors(1, :) =  [0.5 0.5 0.5]; 
-colormap(colors);
-colorbar;
-title('R squared in null offset ')
-xlabel('columns')
-ylabel('rows')
-
 
 %%
 %initiliase an array with maximum value for the each neuron or the maximum
@@ -380,9 +356,25 @@ clear_R_squared_offset(clear_R_squared_offset >.3) = 0.3;
 subplot(5, 6, i);
 imagesc(clear_R_squared_offset )
 clear_R_squared_offset (isnan(clear_R_squared_offset ))=0;
+colors = colormap;
+%set nan value a different color
+colors(1, :) =  [0.5 0.5 0.5]; 
 colormap(colors);
+colorbar;
 imagesc(clear_R_squared_offset )
 title(time_offsets_start(i))
+
+figure(4)
+clear_R_squared = R_squared_matrix1;
+clear_R_squared (clear_R_squared >.3) = 0.3;
+imagesc(clear_R_squared )
+clear_R_squared (isnan(clear_R_squared ))=0;
+imagesc(clear_R_squared )
+colormap(colors);
+colorbar;
+title('R squared in null offset ')
+xlabel('columns')
+ylabel('rows')
 end 
 
 %% mean overall performance at edifferent time points
