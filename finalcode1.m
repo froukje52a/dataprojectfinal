@@ -199,7 +199,7 @@ figure(1)
 plot(R2_mean_0offset)
 xlabel('neurons')
 ylabel('R squared values')
-title('maximum R squared for each neuron aligned')
+title('maximum R squared for each neuron in null offset')
 
 %mean value per offset
 r2_mean_all_offset= mean(r2_mean_all,2);
@@ -225,9 +225,9 @@ hold on;
 significance= -log10(0.05);
 yline(significance)
 hold off;
-title('-log10 of the p_values of the time offset against the 0 index, including 0 itself');
+title('-log10 of the p_values of the time offset against null shift, including null shift');
 xlabel('time offset start');
-ylabel('-log10 p_values against the 0 index' );
+ylabel('-log10 p_values against null shift' );
 legend('-log10 of the p values', '-log10(0.05)')
 
 %% make table into matrix with the channels in the correct place for the matrix
@@ -255,35 +255,24 @@ matrix_info= matrix_info(:, 1:3);
 
 %initiliase an array with maximum value for the each neuron an or the maximum
 %offset
-max_neuron = zeros(96, 1);
 max_offset = zeros(96, 1);
 
 %keeps only the maximum value of mean values of the R2 and its corresponding index 
 %if there are multiple neurons in one channel 
 
-%use accumarray to group the second and third collumn and find its max
-%between them
-grouped_vals = accumarray(matrix_info(:, 3), matrix_info(:, 2), [], @max);
-%set the maximum value of the grouped_vals to each row coressponding to the channel
-max_neuron(1:size(grouped_vals, 1)) = grouped_vals; 
+
 
 %use accumarray to group the first and third collumn and find its max between them 
 grouped_vals_offset = accumarray(matrix_info(:, 3), matrix_info(:, 1), [], @max);
 %set the maximum value of the grouped_vals_offset to each row coressponding to the channel
 max_offset(1:size(grouped_vals_offset, 1)) = grouped_vals_offset; 
 
-%%assign the channels to the values
-all_rows = size(max_neuron, 1);
-all_indices = (1:all_rows);
-%concatenate the channel with the max_neuron
-max_neuron= horzcat(all_indices', max_neuron);
-
 all_rows_offset = size(max_offset, 1);
 all_indices_offset = (1:all_rows_offset);
 %concatenate the channel with the max_offset
 max_offset= horzcat(all_indices_offset', max_offset);
 
-%% display the maximum R_squared in the matrix and the maximum index at the correct location matrix
+%% the maximum index at the correct location matrix
 %initialise index matrix
 index_matrix = zeros(size(matrix_location));
 
@@ -304,9 +293,7 @@ for rows = 1:size(matrix_location, 1)
     end
 end
 
-%%
-%initiliase an array with maximum value for the each neuron or the maximum
-%offset
+%% initiliase an array with maximum value for the each neuron or the maximum offset
 max_neuron_i = zeros(96, 1);
 %initialise R_squared_matrix
 R_squared_matrix1 = zeros(size(matrix_location));
@@ -365,16 +352,18 @@ imagesc(clear_R_squared_offset )
 title(time_offsets_start(i))
 
 figure(4)
-clear_R_squared = R_squared_matrix1;
-clear_R_squared (clear_R_squared >.3) = 0.3;
-imagesc(clear_R_squared )
-clear_R_squared (isnan(clear_R_squared ))=0;
-imagesc(clear_R_squared )
-colormap(colors);
-colorbar;
-title('R squared in null offset ')
-xlabel('columns')
-ylabel('rows')
+if i==19
+    clear_R_squared = R_squared_matrix1;
+    clear_R_squared (clear_R_squared >.3) = 0.3;
+    imagesc(clear_R_squared )
+    clear_R_squared (isnan(clear_R_squared ))=0;
+    imagesc(clear_R_squared )
+    colormap(colors);
+    colorbar;
+    title('R squared in null offset ')
+    xlabel('columns')
+    ylabel('rows')
+end 
 end 
 
 %% mean overall performance at edifferent time points
@@ -388,7 +377,6 @@ index_visual_matrix(index_matrix < 16) = 1;
 index_visual_matrix(index_matrix >= 16 ) = 2; 
 colormap(colors);
 imagesc(index_visual_matrix);
-colorbar;
 title('<= -29.4 sensory feedback')
 xlabel('columns')
 ylabel('rows')
@@ -429,7 +417,7 @@ edge = hist_bar.BinEdges;
 offset = (edge(1:end-1) + edge(2:end)) / 2;
 xlabel('time offset start');
 ylabel('count');
-title('number of neurons in each bin')
+title('number of neurons in each time offset bin')
 
 %% Functions
 
