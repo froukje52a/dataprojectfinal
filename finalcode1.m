@@ -59,6 +59,22 @@ offsets = [-18,-17,-16,-15,-14,-13,-12, -11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2
 %[28] = (9, 88.2 to 98.0)     [29] = (10, 98.0 to 107.8)  [30] = (11, 107.8 to end)
 
 time_offsets_start= [-176.4, -166.6, -156.8, -147.0, -137.2, -127.4, -117.6, -107.8, -98.0, -88.2, -78.4, -68.6, -58.8, -49.0, -39.2, -29.4, -19.6, -9.8, 0, 9.8, 19.6, 29.4, 39.2, 49.0, 58.8, 68.6, 78.4, 88.2, 98.0, 107.8];
+%% load preprocess the S1_unit_guide
+%because of large file in github I already extractecd S1_unit_guide
+%S1_unit_guide= trial_data.S1_unit_guide;  save('S1_unit_guide.mat', 'S1_unit_guide');
+
+%load the the S1_unit guide
+load('S1_unit_guide.mat')
+S1_unit_guide= double(S1_unit_guide);%make it a double 
+%make the index starting from 1 instead of 0 for each neuron
+S1_unit_guide(:,2) = S1_unit_guide(:,2) + 1;
+
+electrode = readtable('elec_map.csv');%Load the electrodes
+save('electrode.mat', 'electrode');
+
+%only get the "interesting" arrays of the table
+electrodes = table2array(electrode(:, {'chan', 'rowNum', 'colNum'}));
+%matrix with column 1 all the channels, column 2 the rowNumbers and columnnumber
 
 %cross-validation on 10 folds
 K_fold = 10;
@@ -213,26 +229,6 @@ title('-log10 of the p_values of the time offset against the 0 index, including 
 xlabel('time offset start');
 ylabel('-log10 p_values against the 0 index' );
 legend('-log10 of the p values', '-log10(0.05)')
-
-
-%% load preprocess the S1_unit_guide
-%because of large file in github I already extractecd S1_unit_guide
-%S1_unit_guide= trial_data.S1_unit_guide;  
-%save('S1_unit_guide.mat', 'S1_unit_guide');
-
-%load the the S1_unit guide
-load('S1_unit_guide.mat')
-S1_unit_guide= double(S1_unit_guide);%make it a double 
-%make the index starting from 1 instead of 0 for each neuron
-S1_unit_guide(:,2) = S1_unit_guide(:,2) + 1;
-
-%% spatial analysation
-electrode = readtable('elec_map.csv');%Load the electrodes
-save('electrode.mat', 'electrode');
-
-%only get the "interesting" arrays of the table
-electrodes = table2array(electrode(:, {'chan', 'rowNum', 'colNum'}));
-%matrix with column 1 all the channels, column 2 the rowNumbers and columnnumber
 
 %% make table into matrix with the channels in the correct place for the matrix
 
