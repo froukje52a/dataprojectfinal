@@ -1,4 +1,4 @@
-%% Project
+%% Project Code
 
 %% info
 %Monkey ID: H
@@ -222,6 +222,7 @@ figure(3)
 %shows the wilcoxon signed rank test, comparing all the indexes maximum 
 plot(time_offsets_start, p_values_log);
 hold on;
+%plot the significance line
 significance= -log10(0.05);
 yline(significance)
 hold off;
@@ -253,15 +254,10 @@ matrix_info= horzcat(max_index_and_neuron, S1_unit_guide);
 %remove the fourth column because not of interest here
 matrix_info= matrix_info(:, 1:3);
 
-%initiliase an array with maximum value for the each neuron an or the maximum
-%offset
+%initiliase an array with the maximum offset
 max_offset = zeros(96, 1);
 
-%keeps only the maximum value of mean values of the R2 and its corresponding index 
-%if there are multiple neurons in one channel 
-
-
-
+%keeps only the corrsponding index of the maximum value of mean values of the R2
 %use accumarray to group the first and third collumn and find its max between them 
 grouped_vals_offset = accumarray(matrix_info(:, 3), matrix_info(:, 1), [], @max);
 %set the maximum value of the grouped_vals_offset to each row coressponding to the channel
@@ -327,7 +323,7 @@ for i= 1:30
             %compare the channel of max_neuron with the matrix location and obtain 
             %the value of that channel out of the second column of max_neuron.
             maximumvalue_i = max_neuron_i(max_neuron_i(:, 1) == matrix_location(rows, cols), 2);
-       %account for empty values 
+            %account for empty values 
             if isempty(maximumvalue_i)
                 R_squared_matrix1(rows, cols) = 0; 
             else
@@ -366,14 +362,16 @@ if i==19
 end 
 end 
 
-%% mean overall performance at edifferent time points
+%% mean overall performance at different time points
 %taking the mean of each column
 index_matrix(index_matrix == 0) = NaN;
 
 figure(6);
 index_visual_matrix = zeros(10,10);
 index_visual_matrix(isnan(index_matrix)) = 0;
+%sensory feedback
 index_visual_matrix(index_matrix < 16) = 1;
+%forward estimation
 index_visual_matrix(index_matrix >= 16 ) = 2; 
 colormap(colors);
 imagesc(index_visual_matrix);
@@ -389,20 +387,22 @@ max_index_and_neuron1= max_index_and_neuron;
 sameindex = time_offsets_start(index_time_offset);
 for i = 1:size(max_index_and_neuron1, 1)
     if max_index_and_neuron1(i, 1) <= numel(sameindex)
-        max_index_and_neuron1(i, 1) = sameindex(max_index_and_neuron1(i, 1));
+       max_index_and_neuron1(i, 1) = sameindex(max_index_and_neuron1(i, 1));
     end
 end
 
-figure(7)
-time_offset = unique(max_index_and_neuron1(:, 1));  
-maximum_r_at_time_offset = zeros(size(time_offset));  
+%only get the unique ones
+time_offset = unique(max_index_and_neuron1(:, 1)); 
+%intiliase 
+maximum_r_at_offset = zeros(size(time_offset));  
 
 for i = 1:length(time_offset)
     %take the mean for multiple values of the same offset
-    maximum_r_at_time_offset(i) = mean(max_index_and_neuron1(max_index_and_neuron1(:, 1) == time_offset(i), 2)); 
+    maximum_r_at_offset(i) = mean(max_index_and_neuron1(max_index_and_neuron1(:, 1) == time_offset(i), 2)); 
 end
 
-bar(time_offset, maximum_r_at_time_offset);
+figure(7)
+bar(time_offset, maximum_r_at_offset);
 xlabel("time offset start")
 ylabel('R2 values')
 title("max R2 at the time offset start")
